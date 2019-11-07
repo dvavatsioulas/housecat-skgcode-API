@@ -118,7 +118,7 @@ app.post('/api/properties/search',(req,res) => {
     
     con.query(`SELECT * FROM properties WHERE price=${searchValues.price}`, function (err, result, fields) {
         if (err) throw err;
-        if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
+        if(isEmptyObject(result)) return res.status(404).send('There are no matches with these properties.');
         res.send(result);
     });
     
