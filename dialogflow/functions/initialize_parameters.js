@@ -1,6 +1,5 @@
 exports.initialize_parameters = function(){
     let userSearchedParams = {
-        "id":null,
         "price":null,
         "sqm":null,
         "location":null,
