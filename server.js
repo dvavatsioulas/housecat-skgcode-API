@@ -36,8 +36,8 @@ app.get('/api',(req,res) => {
 app.get('/api/usertype',(req,res) => {
     if (dialogflowapp.user_type==='landlord'){
         res.send({userType: "Landlord"});
-    }else if (dialogflowapp.user_type==='tenant'){
-        res.send({userType: "Tenant"});
+    }else if (dialogflowapp.user_type==='renter'){
+        res.send({userType: "Renter"});
     }
     else{
         res.send({userType: "UNKNOWN"});
@@ -59,7 +59,7 @@ app.post('/api/addproperty',(req,res) => {
 
 //Returns the list of properties from the database
 app.get('/api/properties',(req,res) => {
-    con.query("SELECT id,price,sqm,location,bedrooms,bathrooms,floor,description,phone,email,img_url,furnitured,heating_type,built_year,parking,propertytypemapping.property_type_title,saletypemapping.sale_type_title FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type) INNER JOIN saletypemapping ON properties.sale_type = saletypemapping.sale_type);", function (err, result, fields) {
+    con.query("SELECT * FROM properties ORDER BY id;", function (err, result, fields) {
       if (err) throw err;
       res.send(result);
     }); 
@@ -68,13 +68,34 @@ app.get('/api/properties',(req,res) => {
 
 
 //Returns the property with this ID
-app.get('/api/properties/:id',(req,res) => {
-    con.query(`SELECT id,price,sqm,location,bedrooms,bathrooms,floor,description,phone,email,img_url,furnitured,heating_type,built_year,parking,propertytypemapping.property_type_title,saletypemapping.sale_type_title FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type) INNER JOIN saletypemapping ON properties.sale_type = saletypemapping.sale_type) WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
+app.get('/api/properties/id=:id',(req,res) => {
+    con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
         if (err) throw err;
         if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
         res.send(result);
     });
 });
+
+//Returns properties with this sale_type
+app.get('/api/properties/saletype=:saletype',(req,res) => {
+    con.query(`SELECT * FROM properties WHERE sale_type=${parseInt(req.params.saletype)}`, function (err, result, fields) {
+        var tempSaleType=req.params.saletype;
+        if (err) throw err;
+        if(isEmptyObject(result)){
+            if(tempSaleType===0){
+                return res.status(404).send('There are no properties for rent.');
+            }
+            else if (tempSaleType===1){
+                return res.status(404).send('There are no properties for sell.');
+            }
+            else{
+                return res.status(404).send('INVALID PARAMETER');
+            }
+        }
+        res.send(result);
+    });
+});
+
 
 //Function to check if json file is empty
 function isEmptyObject(obj) {
