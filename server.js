@@ -28,8 +28,12 @@ con.connect(function(err){
     console.log("Connected to DB");
 });
 
+app.get('/',(req,res) => {
+    res.send('*ROOT* API is up & working.');
+});
+
 app.get('/api',(req,res) => {
-    res.send('Hello people!!!');
+    res.send('API is up & working.');
 });
 
 // Returns the userType defined by the chatbot
@@ -66,7 +70,6 @@ app.get('/api/properties',(req,res) => {
 });
 
 
-
 //Returns the property with this ID
 app.get('/api/properties/id=:id',(req,res) => {
     con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
@@ -76,7 +79,7 @@ app.get('/api/properties/id=:id',(req,res) => {
     });
 });
 
-//Returns properties with this sale_type
+//Returns properties with this sale_type. Used when user clicks on "Rent" or "Buy" button.
 app.get('/api/properties/saletype=:saletype',(req,res) => {
     con.query(`SELECT * FROM properties WHERE sale_type=${parseInt(req.params.saletype)}`, function (err, result, fields) {
         var tempSaleType=req.params.saletype;
@@ -94,6 +97,31 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
         }
         res.send(result);
     });
+});
+
+app.get('/api/properties/id=:id',(req,res) => {
+    con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
+        if (err) throw err;
+        if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
+        res.send(result);
+    });
+});
+
+
+//Search results according to JSON values
+//TODO: Add all filters in WHERE clause
+// con.query(`SELECT * FROM properties WHERE price=${searchValues.price} AND sqm=searchValues.sqm AND location=searchValues.location AND bedrooms=searchValues.bedrooms AND bathrooms=searchValues.bathrooms AND property_type=searchValues.property_type AND floor=searchValues.floor AND sale_type=searchValues.sale_type AND furnitured=searchValues.furnitured AND heating_type=searchValues.heating_type AND parking=searchValues.parking `, function (err, result, fields) {
+
+app.post('/api/properties/search',(req,res) => {
+    var  searchValues = req.body;
+    console.log(searchValues.price);
+    
+    con.query(`SELECT * FROM properties WHERE price=${searchValues.price}`, function (err, result, fields) {
+        if (err) throw err;
+        if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
+        res.send(result);
+    });
+    
 });
 
 
