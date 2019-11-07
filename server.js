@@ -48,13 +48,11 @@ app.get('/api/usertype',(req,res) => {
     }
 });
 
-//Create new item and add it in DB
-//i should fix the null situation 
-//and if check if this house is duplicate
+//Insert new json item into DB
 app.post('/api/addproperty',(req,res) => {
     var property = req.body;
     con.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking)
-    VALUES (${property.price},${property.sqm},'${property.location}',${property.bedrooms},${property.bathrooms},${property.property_type},${property.floor},'${property.description}',${property.sale_type},'${property.phone}','${property.email}','${property.img_url}',${property.furnitured},'${property.heating_type}',${property.built_year},${property.parking})`, function (err, result, fields){
+    VALUES (${property.price},${property.sqm},'${property.location}',${property.bedrooms},${property.bathrooms},${property.property_type},${property.floor},NULLIF('${property.description}','null'),${property.sale_type},'${property.phone}','${property.email}',NULLIF('${property.img_url}','null'),${property.furnitured},'${property.heating_type}',${property.built_year},${property.parking})`, function (err, result, fields){
         if(err) throw err;
         res.send("Your house has been added successfully into DB!");
     });
