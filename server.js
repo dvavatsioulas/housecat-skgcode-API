@@ -29,7 +29,7 @@ con.connect(function(err){
 });
 
 app.get('/',(req,res) => {
-    res.send('*ROOT* API is up & working.');
+    res.send('*ROOT ENDPOINT* API is up & working.');
 });
 
 app.get('/api',(req,res) => {
