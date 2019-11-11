@@ -17,6 +17,8 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
 
         const locate_intent = require('./intents/locate_intent.js')
         const price_intent = require('./intents/price_intent.js')
+        const sqm_intent = require('./intents/sqm_intent.js')
+        const bedrooms_and_bathrooms_intent = require('./intents/bedrooms_and_bathrooms_intent.js')
 
         const intents_parser = require('./functions/intents_parser.js')
         const initialize_parameters = require('./functions/initialize_parameters.js')
@@ -41,7 +43,10 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
 
         intentMap.set('Locate Intent', locate_intent.locate)
         intentMap.set('define_building_type', locate_intent.locate)
-        intentMap.set('Location and Price Declaration', price_intent.price)  
+        intentMap.set('Location and Price Declaration', price_intent.price) 
+        intentMap.set('Square Meters Intent', sqm_intent.sqm)
+        intentMap.set('Bathrooms and Bedrooms Intent', bedrooms_and_bathrooms_intent.bedrooms_and_bathrooms)
+
        
         agent.handleRequest(intentMap)
         
