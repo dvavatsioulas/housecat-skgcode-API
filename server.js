@@ -3,7 +3,8 @@ var cors = require('cors');
 const mysql = require('mysql');
 const { WebhookClient } = require('dialogflow-fulfillment');
 
-const app = express();
+var app = express();
+var port = process.env.PORT || 8080;
 
 app.use(cors());
 
@@ -11,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 //Managing post requests from DialogFlow
-const dialogflowapp = require('./dialogflow/manage_d_post_req.js')
+var dialogflowapp = require('./dialogflow/manage_d_post_req.js')
 dialogflowapp.dialogflow_post_requests(app, express, {WebhookClient})
 
 
@@ -129,5 +130,5 @@ function isEmptyObject(obj) {
 };
 
 // This is necessary in case that PORT has value from the system which is not 8000
-const port = process.env.PORT || 8000;
+
 app.listen(port,() => console.log(`Listening on port ${port}`)); 
