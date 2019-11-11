@@ -5,8 +5,9 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         console.log('')
         console.log('New Post : ')
         console.log('')
+        
         const agent= new WebhookClient({request: req, response: res})
-    
+        
         const welcome_intent = require('./intents/welcome_intent.js')
         const fallback_intent = require('./intents/fallback_intent.js')
         const landlord_intent=require('./intents/landlord_intent.js')
@@ -14,6 +15,16 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         
         const landlord_ask_intent=require('./intents/landlord_ask_intent.js')
         const landlord_add_intent= require('./intents/landlord_add_intent.js')
+
+        const faq1_intent=require('./faq_intents/faq1_intent.js')
+        const faq1_yes_intent=require('./faq_intents/faq1_yes_intent.js')
+        const faq1_no_intent=require('./faq_intents/faq1_no_intent.js')
+        const faq1_fallback_intent=require('./faq_intents/faq1_fallback.js')
+
+        const faq_more_intent=require('./faq_intents/faq_more.js')
+        const faq_more_yes_intent=require('./faq_intents/faq_more_yes.js')
+        const faq_more_no_intent=require('./faq_intents/faq_more_no.js')
+        const faq_more_fallback_intent=require('./faq_intents/faq_more_fallback.js')
 
         const locate_intent = require('./intents/locate_intent.js')
         const price_intent = require('./intents/price_intent.js')
@@ -43,6 +54,16 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         intentMap.set('define_building_type', locate_intent.locate)
         intentMap.set('Location and Price Declaration', price_intent.price)  
        
+        intentMap.set('FAQ 1 Intent', faq1_intent.faq1)
+        intentMap.set('FAQ 1 Intent - yes', faq1_yes_intent.faq1_yes)
+        intentMap.set('FAQ 1 Intent - no', faq1_no_intent.faq1_no)
+        intentMap.set('FAQ 1 Intent - fallback', faq1_fallback_intent.faq1_fallback)
+        
+        intentMap.set('FAQ more', faq_more_intent.faq_more)
+        intentMap.set('FAQ more - yes', faq_more_yes_intent.faq_more_yes)
+        intentMap.set('FAQ more - no', faq_more_no_intent.faq_more_no)
+        intentMap.set('FAQ more - fallback', faq_more_fallback_intent.faq_more_fallback)
+
         agent.handleRequest(intentMap)
         
         if (landlord_intent.user_type != null){
@@ -57,6 +78,7 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
             add_redirect=landlord_add_intent.add_redirect
             console.log('USER wants to redirect.')
         }
+       
         console.log("We got the UserType: "+ user_type)
         module.exports.user_type = user_type
         module.exports.add_redirect = add_redirect
@@ -68,6 +90,7 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
 
         var final_params = intents_parser.intents_parser(init_params); //Console log the parameters
         //console.log("FINAL RESULT "+JSON.stringify(final_params))
+
     })
-    
+
 }

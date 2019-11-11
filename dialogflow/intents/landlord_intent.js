@@ -27,6 +27,5 @@ exports.usertype = function(agent){
     console.log("Mike:" + myr_item + ' ' + message)
     agent.add(myr_item + ' ' + message)
 
-    module.exports.user_type = user_type
-    
+    module.exports.user_type = user_type   
 }
