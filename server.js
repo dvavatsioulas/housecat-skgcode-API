@@ -4,7 +4,7 @@ const mysql = require('mysql');
 const { WebhookClient } = require('dialogflow-fulfillment');
 
 var app = express();
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 8000;
 
 app.use(cors());
 
@@ -107,22 +107,32 @@ app.get('/api/properties/id=:id',(req,res) => {
 });
 
 
-//Search results according to JSON values
-//TODO: Add all filters in WHERE clause
-// con.query(`SELECT * FROM properties WHERE price=${searchValues.price} AND sqm=searchValues.sqm AND location=searchValues.location AND bedrooms=searchValues.bedrooms AND bathrooms=searchValues.bathrooms AND property_type=searchValues.property_type AND floor=searchValues.floor AND sale_type=searchValues.sale_type AND furnitured=searchValues.furnitured AND heating_type=searchValues.heating_type AND parking=searchValues.parking `, function (err, result, fields) {
+//Search results according to JSON received (with filters)
+app.get('/api/properties/search',(req,res) => {
 
-app.post('/api/properties/search',(req,res) => {
-    var  searchValues = req.body;
-    console.log(searchValues.price);
-    
-    con.query(`SELECT * FROM properties WHERE price=${searchValues.price}`, function (err, result, fields) {
+    var  searchJSON = req.body; // Copy POSTed JSON to a variable
+
+    // Build SQL query. Question marks are replaced with valuesFromJSON table
+    var tempSqlquery1="SELECT * FROM properties WHERE (      ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) )      ";
+    var tempSqlQuery2=" AND ( (properties.bedrooms=?) OR (? IS NULL) ) AND ( (properties.bathrooms=?) OR (? IS NULL) ) AND ( (properties.property_type=?) OR (? IS NULL) ) AND ( (properties.floor=?) OR (? IS NULL) )   "
+    var telikiParenthesi=")"; // It's good to leave this parenthesis as a unique string in order to avoid syntax errors
+
+    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,telikiParenthesi); // Join the above 3 parts of SQL query ;
+
+    var valuesFromJSON=[];
+
+    // Iterate searchJSON values (NOT keys!) and put them in valuesFromJSON so they can replace question marks in SQL query
+    for(var key in searchJSON){
+            valuesFromJSON.push(searchJSON[key]);
+            valuesFromJSON.push(searchJSON[key]);
+    }
+
+    con.query(finalSqlQuery, valuesFromJSON, function (err, result, fields) {
         if (err) throw err;
-        if(isEmptyObject(result)) return res.status(404).send('There are no matches with these properties.');
-        res.send(result);
-    });
-    
+            if(isEmptyObject(result)) return res.status(404).send('There are no matches with these properties.');
+            res.send(result);
+        });
 });
-
 
 //Function to check if json file is empty
 function isEmptyObject(obj) {
