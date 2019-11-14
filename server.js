@@ -113,7 +113,7 @@ app.get('/api/properties/search',(req,res) => {
     var  searchJSON = req.body; // Copy POSTed JSON to a variable
 
     // Build SQL query. Question marks are replaced with valuesFromJSON table
-    var tempSqlquery1="SELECT * FROM properties WHERE (      ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) )      ";
+    var tempSqlquery1="SELECT * FROM properties WHERE (      ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price>=?) OR (? IS NULL) )  AND ( (properties.price<=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) )      ";
     var tempSqlQuery2=" AND ( (properties.bedrooms=?) OR (? IS NULL) ) AND ( (properties.bathrooms=?) OR (? IS NULL) ) AND ( (properties.property_type=?) OR (? IS NULL) ) AND ( (properties.floor=?) OR (? IS NULL) )   "
     var telikiParenthesi=")"; // It's good to leave this parenthesis as a unique string in order to avoid syntax errors
 
