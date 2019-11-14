@@ -98,17 +98,9 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
     });
 });
 
-app.get('/api/properties/id=:id',(req,res) => {
-    con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
-        if (err) throw err;
-        if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
-        res.send(result);
-    });
-});
-
 
 //Search results according to JSON received (with filters)
-app.get('/api/properties/search',(req,res) => {
+app.post('/api/properties/search',(req,res) => {
 
     var  searchJSON = req.body; // Copy POSTed JSON to a variable
 
