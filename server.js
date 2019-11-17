@@ -1,7 +1,10 @@
 const express = require('express');
 var cors = require('cors');
 const mysql = require('mysql');
-const { WebhookClient } = require('dialogflow-fulfillment');
+//Required of Dialogflow
+const { WebhookClient, Card, Suggestion } = require('dialogflow-fulfillment');
+const bodyParser = require('body-parser');
+
 
 var app = express();
 var port = process.env.PORT || 8000;
@@ -12,8 +15,12 @@ app.use(cors());
 app.use(express.json());
 
 //Managing post requests from DialogFlow
+app.use(bodyParser.json());
+var dialogflow2 = require('./dialogflow/routes/dialogflowRoutes.js')
+dialogflow2.dialogflow2_post_requests(app, express)
+//var myminitest = require('./dialogflow/routes/dialogflowRoutes.js')(app)
 var dialogflowapp = require('./dialogflow/manage_d_post_req.js')
-dialogflowapp.dialogflow_post_requests(app, express, {WebhookClient})
+dialogflowapp.dialogflow_post_requests(app, express, {WebhookClient, Card, Suggestion})
 
 
 var con = mysql.createConnection({
@@ -39,7 +46,8 @@ app.get('/api',(req,res) => {
 
 // Returns the userType defined by the chatbot
 app.get('/api/usertype',(req,res) => {
-    if (dialogflowapp.user_type==='landlord'){
+    res.send(dialogflow2.UserType)
+    /*if (dialogflowapp.user_type==='landlord'){
         res.send({userType: "Landlord"});
     }else if (dialogflowapp.user_type==='renter'){
         res.send({userType: "Renter"});
@@ -47,6 +55,7 @@ app.get('/api/usertype',(req,res) => {
     else{
         res.send({userType: "UNKNOWN"});
     }
+    */
 });
 
 //Insert new json item into DB
