@@ -1,11 +1,11 @@
-exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
+exports.dialogflow_post_requests = function(app, express, {WebhookClient, Card, Suggestion}){
 
     app.post('/dialogflow', express.json(), (req,res)=> {
         
         console.log('')
         console.log('New Post : ')
         console.log('')
-        
+
         const agent= new WebhookClient({request: req, response: res})
         
         const welcome_intent = require('./intents/welcome_intent.js')
@@ -35,11 +35,11 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         const initialize_parameters = require('./functions/initialize_parameters.js')
         
         //Initialize some parameters
-        let user_type=null
+        var user_type
         let add_redirect = false;
 
-        landlord_intent.user_type = null
-        renter_intent.user_type = null
+        //landlord_intent.user_type = null
+        //renter_intent.user_type = null
 
         var init_params = initialize_parameters.initialize_parameters(); //Call jsFunction that initializes the parameters
 
@@ -58,7 +58,6 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         intentMap.set('Square Meters Intent', sqm_intent.sqm)
         intentMap.set('Bathrooms and Bedrooms Intent', bedrooms_and_bathrooms_intent.bedrooms_and_bathrooms)
 
-       
         intentMap.set('FAQ 1 Intent', faq1_intent.faq1)
         intentMap.set('FAQ 1 Intent - yes', faq1_yes_intent.faq1_yes)
         intentMap.set('FAQ 1 Intent - no', faq1_no_intent.faq1_no)
@@ -69,8 +68,13 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         intentMap.set('FAQ more - no', faq_more_no_intent.faq_more_no)
         intentMap.set('FAQ more - fallback', faq_more_fallback_intent.faq_more_fallback)
 
-        agent.handleRequest(intentMap)
-        
+        if (landlord_intent.user_type==='landlord'){
+            res.redirect('https://www.google.com/')
+            console.log('REDIRECT')
+        }else{
+            agent.handleRequest(intentMap)
+        }
+
         if (landlord_intent.user_type != null){
             user_type=landlord_intent.user_type
         }else if (renter_intent.user_type != null){
@@ -97,5 +101,6 @@ exports.dialogflow_post_requests = function(app, express, {WebhookClient}){
         //console.log("FINAL RESULT "+JSON.stringify(final_params))
 
     })
+
 
 }

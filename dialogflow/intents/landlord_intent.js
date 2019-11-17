@@ -25,7 +25,7 @@ exports.usertype = function(agent){
         message='Would you like to ask a question or add a house/apartment?'
     }
     console.log("Mike:" + myr_item + ' ' + message)
-    agent.add(myr_item + ' ' + message)
+    //agent.add(myr_item + ' ' + message)
 
     module.exports.user_type = user_type   
 }
