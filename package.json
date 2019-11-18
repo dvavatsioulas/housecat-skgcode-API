@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "npm run server",
+    "start": "node server.js",
     "server": "nodemon server.js",
     "tunnel": "ngrok http 8000"
   },
