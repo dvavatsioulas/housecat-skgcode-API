@@ -82,7 +82,7 @@ app.get('/api/properties',(req,res) => {
 app.get('/api/properties/id=:id',(req,res) => {
     con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
         if (err) throw err;
-        if(isEmptyObject(result)) return res.status(404).send('There is no property with this id');
+        if(isEmptyObject(result)) return res.status(204).send('There is no property with this id');
         res.send(result);
     });
 });
@@ -94,13 +94,13 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
         if (err) throw err;
         if(isEmptyObject(result)){
             if(tempSaleType===0){
-                return res.status(404).send('There are no properties for rent.');
+                return res.status(204).send('There are no properties for rent.');
             }
             else if (tempSaleType===1){
-                return res.status(404).send('There are no properties for sell.');
+                return res.status(204).send('There are no properties for sell.');
             }
             else{
-                return res.status(404).send('INVALID PARAMETER');
+                return res.status(204).send('INVALID PARAMETER');
             }
         }
         res.send(result);
@@ -131,7 +131,7 @@ app.post('/api/properties/search',(req,res) => {
 
     con.query(finalSqlQuery, valuesFromJSON, function (err, result, fields) {
         if (err) throw err;
-            if(isEmptyObject(result)) return res.status(404).send('There are no matches with these properties.');
+            if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
             res.send(result);
         });
 });
