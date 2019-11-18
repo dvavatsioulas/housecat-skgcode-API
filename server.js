@@ -78,6 +78,21 @@ app.get('/api/properties',(req,res) => {
 });
 
 
+//Return the last 3 entered house
+app.get('/api/3properties',(req,res) => {
+
+    var tempSqlquery1="SELECT id,price,sqm,location,bedrooms,bathrooms,floor,description,phone,email,img_url,furnitured,heating_type,built_year,parking,propertytypemapping.property_type_title, ";
+    var tempSqlQuery2="saletypemapping.sale_type_title FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type)";
+    var tempSqlQuery3=" INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type) ORDER BY id DESC LIMIT 3;"
+
+    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,tempSqlQuery3); // Join the above 3 parts of SQL query ;
+
+    con.query(finalSqlQuery, function (err, result, fields) {
+      if (err) throw err;
+      res.send(result);
+    }); 
+});
+
 //Returns the property with this ID
 app.get('/api/properties/id=:id',(req,res) => {
     con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
