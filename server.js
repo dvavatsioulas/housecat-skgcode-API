@@ -121,10 +121,38 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
         res.send(result);
     });
 });
-
-
 //Search results according to JSON received (with filters)
 app.post('/api/properties/search',(req,res) => {
+
+    var  searchJSON = req.body; // Copy POSTed JSON to a variable
+
+    // Build SQL query. Question marks are replaced with valuesFromJSON table
+    var tempSqlquery1="SELECT * FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type)) ";
+    var tempSqlQuery2=" WHERE (    ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price>=?) OR (? IS NULL) )  AND ( (properties.price<=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) ) "
+    var tempSqlQuery3=" AND ( (properties.bedrooms=?) OR (? IS NULL) ) AND ( (properties.bathrooms=?) OR (? IS NULL) ) AND ( (properties.property_type=?) OR (? IS NULL) ) AND ( (properties.floor=?) OR (? IS NULL) )  AND ( (properties.sale_type=?) OR (? IS NULL) ) ";
+    var tempSqlQuery4="AND ( (properties.furnitured=?) OR (? IS NULL) ) AND ( (properties.heating_type=?) OR (? IS NULL) )  AND ( (properties.built_year>=?) OR (? IS NULL) ) AND ( (properties.built_year<=?) OR (? IS NULL) ) AND ( (properties.parking=?) OR (? IS NULL) ) ";
+    
+    var telikiParenthesi=")"; // It's good to leave this parenthesis as a unique string in order to avoid syntax errors
+
+    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,tempSqlQuery3,tempSqlQuery4,telikiParenthesi); // Join the above 3 parts of SQL query ;
+
+    var valuesFromJSON=[];
+
+    // Iterate searchJSON values (NOT keys!) and put them in valuesFromJSON so they can replace question marks in SQL query
+    for(var key in searchJSON){
+            valuesFromJSON.push(searchJSON[key]);
+            valuesFromJSON.push(searchJSON[key]);
+    }
+
+    con.query(finalSqlQuery, valuesFromJSON, function (err, result, fields) {
+        if (err) throw err;
+            if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
+            res.send(result);
+        });
+});
+
+//Search results according to JSON received (with filters)
+app.post('/api/properties/OLDsearch',(req,res) => {
 
     var  searchJSON = req.body; // Copy POSTed JSON to a variable
 
