@@ -104,7 +104,7 @@ app.get('/api/properties/id=:id',(req,res) => {
 
 //Returns properties with this sale_type. Used when user clicks on "Rent" or "Buy" button.
 app.get('/api/properties/saletype=:saletype',(req,res) => {
-    con.query(`SELECT * FROM properties WHERE sale_type=${parseInt(req.params.saletype)}`, function (err, result, fields) {
+    con.query(`SELECT * FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type)) WHERE properties.sale_type=${parseInt(req.params.saletype)}`, function (err, result, fields) {
         var tempSaleType=req.params.saletype;
         if (err) throw err;
         if(isEmptyObject(result)){
