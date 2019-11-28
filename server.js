@@ -59,14 +59,19 @@ app.get('/api/usertype',(req,res) => {
 });
 
 //Insert new json item into DB
-app.post('/api/addproperty',(req,res) => {
-    var property = req.body;
-    con.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking)
-    VALUES (${property.price},${property.sqm},'${property.location}',${property.bedrooms},${property.bathrooms},${property.property_type},${property.floor},NULLIF('${property.description}','null'),${property.sale_type},'${property.phone}','${property.email}',NULLIF('${property.img_url}','null'),${property.furnitured},'${property.heating_type}',${property.built_year},${property.parking})`, function (err, result, fields){
+app.post('/api/properties/addproperty',(req,res) => {
+    var body = req.body;
+    
+    if(body.img_url===null){
+        body.img_url="https://iconsgalore.com/wp-content/uploads/2018/10/house-1-featured-2.png";
+    }
+
+    var tempValues=[body.price,body.sqm,body.location,body.bedrooms,body.bathrooms,body.property_type,body.floor,body.description,body.sale_type,body.phone,body.email,body.img_url,body.furnitured,body.heating_type,body.builtyear,body.parking];
+    
+    con.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )`,tempValues , function (err, result, fields){
         if(err) throw err;
         res.send("Your house has been added successfully into DB!");
     });
-    
 })
 
 //Returns the list of properties from the database
