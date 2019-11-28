@@ -9,13 +9,13 @@ const bodyParser = require('body-parser');
 var app = express();
 var port = process.env.PORT || 8000;
 
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-//This is necessary for method post
-app.use(express.json());
 
 //Managing post requests from DialogFlow
-app.use(bodyParser.json());
 var dialogflow2 = require('./dialogflow/routes/dialogflowRoutes.js')
 dialogflow2.dialogflow2_post_requests(app, express)
 //var myminitest = require('./dialogflow/routes/dialogflowRoutes.js')(app)
@@ -79,13 +79,9 @@ app.get('/api/properties',(req,res) => {
 
 
 //Return the last 3 entered house
-app.get('/api/3properties',(req,res) => {
+app.get('/api/properties/3properties',(req,res) => {
 
-    var tempSqlquery1="SELECT id,price,sqm,location,bedrooms,bathrooms,floor,description,phone,email,img_url,furnitured,heating_type,built_year,parking,propertytypemapping.property_type_title, ";
-    var tempSqlQuery2="saletypemapping.sale_type_title FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type)";
-    var tempSqlQuery3=" INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type) ORDER BY id DESC LIMIT 3;"
-
-    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,tempSqlQuery3); // Join the above 3 parts of SQL query ;
+    var finalSqlQuery="SELECT * FROM properties ORDER BY id DESC LIMIT 3;"
 
     con.query(finalSqlQuery, function (err, result, fields) {
       if (err) throw err;
@@ -132,55 +128,20 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
 //Search results according to JSON received (with filters)
 app.post('/api/properties/search',(req,res) => {
 
-    var  searchJSON = req.body; // Copy POSTed JSON to a variable
+    var  body = req.body; // Copy POSTed JSON to a variable
 
     // Build SQL query. Question marks are replaced with valuesFromJSON table
-    var tempSqlquery1="SELECT * FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type)) ";
-    var tempSqlQuery2=" WHERE (    ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price>=?) OR (? IS NULL) )  AND ( (properties.price<=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) ) "
-    var tempSqlQuery3=" AND ( (properties.bedrooms=?) OR (? IS NULL) ) AND ( (properties.bathrooms=?) OR (? IS NULL) ) AND ( (properties.property_type=?) OR (? IS NULL) ) AND ( (properties.floor=?) OR (? IS NULL) )  AND ( (properties.sale_type=?) OR (? IS NULL) ) ";
-    var tempSqlQuery4="AND ( (properties.furnitured=?) OR (? IS NULL) ) AND ( (properties.heating_type=?) OR (? IS NULL) )  AND ( (properties.built_year>=?) OR (? IS NULL) ) AND ( (properties.built_year<=?) OR (? IS NULL) ) AND ( (properties.parking=?) OR (? IS NULL) ) ";
-    
-    var telikiParenthesi=")"; // It's good to leave this parenthesis as a unique string in order to avoid syntax errors
+    var mySQLQuery1="SELECT * FROM properties WHERE (       (? IS NULL OR ?<=properties.price) AND (? IS NULL OR ?>=properties.price) AND  (? IS NULL OR ?<=properties.sqm) AND (? IS NULL OR ?>=properties.sqm)  AND (? IS NULL OR ?=properties.location) AND  (? IS NULL OR ?=properties.bedrooms) AND  (? IS NULL OR ?=properties.bathrooms) AND  (? IS NULL OR ?=properties.property_type)  ";
+    var mySQLQuery2=" AND (? IS NULL OR ?=properties.floor)   AND  (? IS NULL OR ?=properties.sale_type)    AND  (? IS NULL OR ?=properties.furnitured) AND  (? IS NULL OR ?=properties.heating_type)       )";
 
-    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,tempSqlQuery3,tempSqlQuery4,telikiParenthesi); // Join the above 3 parts of SQL query ;
+    var finalSqlQuery=mySQLQuery1.concat(mySQLQuery2);
+    console.log(finalSqlQuery);
 
     var valuesFromJSON=[];
+    valuesFromJSON.push(body.minprice, body.minprice, body.maxprice, body.maxprice, body.minsqm, body.minsqm, body.maxsqm, body.maxsqm, body.location, body.location, body.bedrooms, body.bedrooms);
+    valuesFromJSON.push(body.bathrooms, body.bathrooms, body.property_type, body.property_type, body.floor, body.floor, body.sale_type, body.sale_type, body.furnitured, body.furnitured, body.heating_type, body.heating_type);
 
-    // Iterate searchJSON values (NOT keys!) and put them in valuesFromJSON so they can replace question marks in SQL query
-    for(var key in searchJSON){
-            valuesFromJSON.push(searchJSON[key]);
-            valuesFromJSON.push(searchJSON[key]);
-    }
-
-    con.query(finalSqlQuery, valuesFromJSON, function (err, result, fields) {
-        if (err) throw err;
-            if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
-            res.send(result);
-        });
-});
-
-//Search results according to JSON received (with filters)
-app.post('/api/properties/OLDsearch',(req,res) => {
-
-    var  searchJSON = req.body; // Copy POSTed JSON to a variable
-
-    // Build SQL query. Question marks are replaced with valuesFromJSON table
-    var tempSqlquery1="SELECT * FROM properties WHERE (    ( (properties.id=?) OR (? IS NULL) ) AND ( (properties.price>=?) OR (? IS NULL) )  AND ( (properties.price<=?) OR (? IS NULL) ) AND ( (properties.sqm=?) OR (? IS NULL) ) AND ( (properties.location=?) OR (? IS NULL) )   ";
-    var tempSqlQuery2=" AND ( (properties.bedrooms=?) OR (? IS NULL) ) AND ( (properties.bathrooms=?) OR (? IS NULL) ) AND ( (properties.property_type=?) OR (? IS NULL) ) AND ( (properties.floor=?) OR (? IS NULL) )  AND ( (properties.sale_type=?) OR (? IS NULL) ) ";
-    var tempSqlQuery3="AND ( (properties.furnitured=?) OR (? IS NULL) ) AND ( (properties.heating_type=?) OR (? IS NULL) )  AND ( (properties.built_year>=?) OR (? IS NULL) ) AND ( (properties.built_year<=?) OR (? IS NULL) ) AND ( (properties.parking=?) OR (? IS NULL) ) ";
-    var telikiParenthesi=")"; // It's good to leave this parenthesis as a unique string in order to avoid syntax errors
-
-    var finalSqlQuery = tempSqlquery1.concat(tempSqlQuery2,tempSqlQuery3,telikiParenthesi); // Join the above 3 parts of SQL query ;
-
-    var valuesFromJSON=[];
-
-    // Iterate searchJSON values (NOT keys!) and put them in valuesFromJSON so they can replace question marks in SQL query
-    for(var key in searchJSON){
-            valuesFromJSON.push(searchJSON[key]);
-            valuesFromJSON.push(searchJSON[key]);
-    }
-
-    con.query(finalSqlQuery, valuesFromJSON, function (err, result, fields) {
+    con.query(finalSqlQuery,valuesFromJSON,function (err, result, fields) {
         if (err) throw err;
             if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
             res.send(result);
