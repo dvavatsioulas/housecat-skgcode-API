@@ -132,7 +132,7 @@ app.post('/api/properties/search',(req,res) => {
 
     // Build SQL query. Question marks are replaced with valuesFromJSON table
     var mySQLQuery1="SELECT * FROM properties WHERE (       (? IS NULL OR ?<=properties.price) AND (? IS NULL OR ?>=properties.price) AND  (? IS NULL OR ?<=properties.sqm) AND (? IS NULL OR ?>=properties.sqm)  AND (? IS NULL OR ?=properties.location) AND  (? IS NULL OR ?=properties.bedrooms) AND  (? IS NULL OR ?=properties.bathrooms) AND  (? IS NULL OR ?=properties.property_type)  ";
-    var mySQLQuery2=" AND (? IS NULL OR ?=properties.floor)   AND  (? IS NULL OR ?=properties.sale_type)    AND  (? IS NULL OR ?=properties.furnitured) AND  (? IS NULL OR ?=properties.heating_type)       )";
+    var mySQLQuery2=" AND (? IS NULL OR ?=properties.floor)   AND  (? IS NULL OR ?=properties.sale_type)    AND  (? IS NULL OR ?=properties.furnitured) AND  (? IS NULL OR ?=properties.heating_type)    AND  (? IS NULL OR ?<=properties.built_year)  AND  (? IS NULL OR ?=properties.parking)       )";
 
     var finalSqlQuery=mySQLQuery1.concat(mySQLQuery2);
     console.log(finalSqlQuery);
@@ -140,7 +140,7 @@ app.post('/api/properties/search',(req,res) => {
     var valuesFromJSON=[];
     valuesFromJSON.push(body.minprice, body.minprice, body.maxprice, body.maxprice, body.minsqm, body.minsqm, body.maxsqm, body.maxsqm, body.location, body.location, body.bedrooms, body.bedrooms);
     valuesFromJSON.push(body.bathrooms, body.bathrooms, body.property_type, body.property_type, body.floor, body.floor, body.sale_type, body.sale_type, body.furnitured, body.furnitured, body.heating_type, body.heating_type);
-
+    valuesFromJSON.push(body.minbuiltyear, body.minbuiltyear, body.parking, body.parking);
     con.query(finalSqlQuery,valuesFromJSON,function (err, result, fields) {
         if (err) throw err;
             if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
