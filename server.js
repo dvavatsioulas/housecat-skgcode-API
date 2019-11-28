@@ -104,7 +104,14 @@ app.get('/api/properties/id=:id',(req,res) => {
 
 //Returns properties with this sale_type. Used when user clicks on "Rent" or "Buy" button.
 app.get('/api/properties/saletype=:saletype',(req,res) => {
-    con.query(`SELECT * FROM ((properties INNER JOIN propertytypemapping ON properties.property_type = propertytypemapping.property_type INNER JOIN saletypemapping ON properties.sale_type =saletypemapping.sale_type)) WHERE properties.sale_type=${parseInt(req.params.saletype)}`, function (err, result, fields) {
+    var tempSaleType;
+    if(req.params.saletype==0){
+        tempSaleType="Rent";
+    }
+    else{
+        tempSaleType="Sale"
+    }
+    con.query(`SELECT * FROM properties WHERE properties.sale_type=?`, tempSaleType, function (err, result, fields) {
         var tempSaleType=req.params.saletype;
         if (err) throw err;
         if(isEmptyObject(result)){
@@ -112,7 +119,7 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
                 return res.status(204).send('There are no properties for rent.');
             }
             else if (tempSaleType===1){
-                return res.status(204).send('There are no properties for sell.');
+                return res.status(204).send('There are no properties for sale.');
             }
             else{
                 return res.status(204).send('INVALID PARAMETER');
@@ -121,6 +128,7 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
         res.send(result);
     });
 });
+
 //Search results according to JSON received (with filters)
 app.post('/api/properties/search',(req,res) => {
 
