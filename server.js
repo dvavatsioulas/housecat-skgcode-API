@@ -153,6 +153,14 @@ app.post('/api/properties/search',(req,res) => {
         });
 });
 
+app.get('/api/agents/id=:id',(req,res) => {
+    con.query(`SELECT * FROM agents WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
+        if (err) throw err;
+        if(isEmptyObject(result)) return res.status(204).send('There is no agent with this id');
+        res.send(result);
+    });
+});
+
 //Function to check if json file is empty
 function isEmptyObject(obj) {
     return !Object.keys(obj).length;
