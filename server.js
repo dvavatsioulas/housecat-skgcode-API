@@ -23,18 +23,18 @@ var dialogflowapp = require('./dialogflow/manage_d_post_req.js')
 dialogflowapp.dialogflow_post_requests(app, express, {WebhookClient, Card, Suggestion})
 
 
-var con = mysql.createConnection({
+const pool = mysql.createPool({
     host: "***REMOVED***",
     port: 3306,
     user: "***REMOVED***",
     password: "***REMOVED***",
     database: "***REMOVED***"
-});
+  });
 
-con.connect(function(err){
-    if(err) throw err;
-    console.log("Connected to DB");
-});
+// pool.connect(function(err){
+//     if(err) throw err;
+//     console.log("Connected to DB");
+// });
 
 app.get('/',(req,res) => {
     res.send('*ROOT ENDPOINT* API is up & working.');
@@ -68,7 +68,7 @@ app.post('/api/properties/addproperty',(req,res) => {
 
     var tempValues=[body.price,body.sqm,body.location,body.bedrooms,body.bathrooms,body.property_type,body.floor,body.description,body.sale_type,body.phone,body.email,body.img_url,body.furnitured,body.heating_type,body.builtyear,body.parking];
     
-    con.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )`,tempValues , function (err, result, fields){
+    pool.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )`,tempValues , function (err, result, fields){
         if(err) throw err;
         res.send("Your house has been added successfully into DB!");
     });
@@ -76,7 +76,7 @@ app.post('/api/properties/addproperty',(req,res) => {
 
 //Returns the list of properties from the database
 app.get('/api/properties',(req,res) => {
-    con.query("SELECT * FROM properties ORDER BY id;", function (err, result, fields) {
+    pool.query("SELECT * FROM properties ORDER BY id;", function (err, result, fields) {
       if (err) throw err;
       res.send(result);
     }); 
@@ -88,7 +88,7 @@ app.get('/api/properties/3properties',(req,res) => {
 
     var finalSqlQuery="SELECT * FROM properties ORDER BY id DESC LIMIT 3;"
 
-    con.query(finalSqlQuery, function (err, result, fields) {
+    pool.query(finalSqlQuery, function (err, result, fields) {
       if (err) throw err;
       res.send(result);
     }); 
@@ -96,7 +96,7 @@ app.get('/api/properties/3properties',(req,res) => {
 
 //Returns the property with this ID
 app.get('/api/properties/id=:id',(req,res) => {
-    con.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
+    pool.query(`SELECT * FROM properties WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
         if (err) throw err;
         if(isEmptyObject(result)) return res.status(204).send('There is no property with this id');
         res.send(result);
@@ -112,7 +112,7 @@ app.get('/api/properties/saletype=:saletype',(req,res) => {
     else{
         tempSaleType="Sale"
     }
-    con.query(`SELECT * FROM properties WHERE properties.sale_type=?`, tempSaleType, function (err, result, fields) {
+    pool.query(`SELECT * FROM properties WHERE properties.sale_type=?`, tempSaleType, function (err, result, fields) {
         var tempSaleType=req.params.saletype;
         if (err) throw err;
         if(isEmptyObject(result)){
@@ -146,7 +146,7 @@ app.post('/api/properties/search',(req,res) => {
     valuesFromJSON.push(body.minprice, body.minprice, body.maxprice, body.maxprice, body.minsqm, body.minsqm, body.maxsqm, body.maxsqm, body.location, body.location, body.bedrooms, body.bedrooms);
     valuesFromJSON.push(body.bathrooms, body.bathrooms, body.property_type, body.property_type, body.floor, body.floor, body.sale_type, body.sale_type, body.furnitured, body.furnitured, body.heating_type, body.heating_type);
     valuesFromJSON.push(body.minbuiltyear, body.minbuiltyear, body.parking, body.parking);
-    con.query(finalSqlQuery,valuesFromJSON,function (err, result, fields) {
+    pool.query(finalSqlQuery,valuesFromJSON,function (err, result, fields) {
         if (err) throw err;
             if(isEmptyObject(result)) return res.status(204).send('There are no matches with these properties.');
             res.send(result);
@@ -154,7 +154,7 @@ app.post('/api/properties/search',(req,res) => {
 });
 
 app.get('/api/agents/id=:id',(req,res) => {
-    con.query(`SELECT * FROM agents WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
+    pool.query(`SELECT * FROM agents WHERE id=${parseInt(req.params.id)}`, function (err, result, fields) {
         if (err) throw err;
         if(isEmptyObject(result)) return res.status(204).send('There is no agent with this id');
         res.send(result);
