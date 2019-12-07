@@ -56,6 +56,10 @@ app.get('/api/usertype',(req,res) => {
 //Insert new json item into DB
 app.post('/api/properties/addproperty',(req,res) => {
     var body = req.body;
+    
+    if(body.img_url===null){
+        body.img_url="https://iconsgalore.com/wp-content/uploads/2018/10/house-1-featured-2.png";
+    }
 
     var tempValues = [body.price, body.sqm, body.location, body.bedrooms, body.bathrooms, body.property_type, body.floor, body.description, body.sale_type, body.phone, body.email, body.img_url, body.furnitured, body.heating_type, body.builtyear, body.parking];
     try {
