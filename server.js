@@ -64,10 +64,14 @@ app.post('/api/properties/addproperty',(req,res) => {
     var tempValues = [body.price, body.sqm, body.location, body.bedrooms, body.bathrooms, body.property_type, body.floor, body.description, body.sale_type, body.phone, body.email, body.img_url, body.furnitured, body.heating_type, body.builtyear, body.parking];
     try {
         pool.query(`INSERT INTO properties (price,sqm,location,bedrooms,bathrooms,property_type,floor,description,sale_type,phone,email,img_url,furnitured,heating_type,built_year,parking) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )`, tempValues, function (err) {
-            res.send("Your house has been added successfully into DB!");
+            if (!err) {
+                res.send('Your house has been added successfully into DB!');
+            }else{
+                res.send("Oops, something went wrong. I'll let our back-end team know! ERROR CODE: 5.1"); //HOUSE NOT ADDED TO DB! SOMETHING IS WRONT ON THE JSON SENT!
+            }
         });
     } catch (err) {
-        res.send("Oops, something went wrong. I'll let our back-end team know! ERROR CODE: 5");
+        res.send("Oops, something went wrong. I'll let our back-end team know! ERROR CODE: 5.2");
     }
 
 })
