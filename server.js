@@ -24,11 +24,11 @@ dialogflowapp.dialogflow_post_requests(app, express, {WebhookClient, Card, Sugge
 
 
 const pool = mysql.createPool({
-    host: "***REMOVED***",
-    port: 3306,
-    user: "***REMOVED***",
-    password: "***REMOVED***",
-    database: "***REMOVED***"
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 app.get('/',(req,res) => {
