@@ -1,4 +1,4 @@
-# HouseCat-SKGcode-API
+# HouseCat (API)
 <h3> Try the app online at: <a href="https://housecat-skgcode.herokuapp.com/">housecat-skgcode.herokuapp.com</a> </h3>  
 
 **HouseCat** is a **real-estate website/web app** which helps you find your perfect house.  
