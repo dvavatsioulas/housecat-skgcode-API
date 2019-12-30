@@ -1,8 +1,7 @@
 const express = require('express');
 var cors = require('cors');
 const mysql = require('mysql');
-//Required of Dialogflow
-const { WebhookClient, Card, Suggestion } = require('dialogflow-fulfillment');
+const { WebhookClient, Card, Suggestion } = require('dialogflow-fulfillment'); //Required for Dialogflow
 const bodyParser = require('body-parser');
 
 
@@ -42,15 +41,6 @@ app.get('/api',(req,res) => {
 // Returns the userType defined by the chatbot
 app.get('/api/usertype',(req,res) => {
     res.send(dialogflow2.UserType)
-    /*if (dialogflowapp.user_type==='landlord'){
-        res.send({userType: "Landlord"});
-    }else if (dialogflowapp.user_type==='renter'){
-        res.send({userType: "Renter"});
-    }
-    else{
-        res.send({userType: "UNKNOWN"});
-    }
-    */
 });
 
 //Insert new json item into DB
@@ -194,7 +184,5 @@ app.get('/api/agents/id=:id', (req, res) => {
 function isEmptyObject(obj) {
     return !Object.keys(obj).length;
 };
-
-// This is necessary in case that PORT has value from the system which is not 8000
 
 app.listen(port,() => console.log(`Listening on port ${port}`)); 
