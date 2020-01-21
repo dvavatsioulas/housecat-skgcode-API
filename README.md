@@ -19,6 +19,9 @@ Our **chatbot**, named cat-bot, is always there to **answer your questions** and
 • Vavatsioulas Dimitris [@dvavatsioulas](https://github.com/dvavatsioulas)  
 • Xenidou Olympia [@olyxen](https://github.com/olyxen)  
 
+# Keep in mind
+HouseCat is not a service for finding homes in real life. HouseCat is made just for educational purposes.
+
 # Notes
 This project is made thanks to [skg.code](http://www.skgcode.gr) educational program.  
 Thank you for giving us the oppurtunity to work with a group compounded of great people!
