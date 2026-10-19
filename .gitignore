@@ -61,4 +61,4 @@ typings/
 .next
 
 # communication keys for dialogflow
-config/dev.js
+dialogflow/config/dev.js
